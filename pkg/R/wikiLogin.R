@@ -29,23 +29,27 @@
 #' @param baseURL a string giving the base URL of the wiki
 #' @param username a string giving the username of the bot
 #' @param password a string giving the password of the bot
-#' @param handle a curl handle
 #' @return after a successful login, a list containing the \code{result}, \code{lguserid},
-#' \code{lgusername}, \code{lgtoken}, \code{cookieprefix} and \code{sessionid}, otherwise an error is thrown.
+#' \code{lgusername}, \code{lgtoken}, \code{cookieprefix}, \code{sessionid} and the curl 
+#' \code{handle}, otherwise an error is thrown. The cookie returned by the server is stored
+#' in a file called 'wikiCookies'.
 #' @note At the moment there is no support for LDAP authentication.
 #' @references \url{http://www.mediawiki.org/wiki/API:Login}
 #' @author Peter Konings \email{peter.konings@@esat.kuleuven.be}
-wikiLogin <- function(baseURL, username, password, handle)
+wikiLogin <- function(baseURL, username, password)
 {
+	handle <- getCurlHandle(cookiefile = 'wikiCookies')
+	# add terminal slash if necessary
+	baseURL <- ifelse(grepl(baseURL, pattern = '\\/$'), baseURL, paste(baseURL, '/', sep = ''))
 	loginRequest <- paste(baseURL, 'api.php?action=login&format=xml', sep = '')
 	loginResult <- postForm(loginRequest,
 			'lgname' = username,
 			'lgpassword' = password,
 			curl = handle)
-	print(loginResult)
+#	print(loginResult)
 	loginResult <- as.list(xmlAttrs(getNodeSet(xmlInternalTreeParse(loginResult), path = '//api/login')[[1]]))
 	switch(loginResult$result,
-			Success = return(loginResult),
+			Success = return(c(loginResult, handle = handle, baseURL = baseURL)),
 			NoName = stop('You did not set the lgname parameter', call. = FALSE),
 			Illegal = stop(' You provided an illegal username', call. = FALSE),
 			NotExists = stop('The username you provided does not exist', call. = FALSE),

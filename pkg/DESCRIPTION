@@ -1,0 +1,15 @@
+Package: wikirobot
+Type: Package
+Title: wikiRobot provides access to the MediaWiki API and a Sweave driver for MediaWiki markup
+Version: 0.1
+Date: 2009-12-23
+Author: Peter Konings
+Maintainer: Peter Konings <peter.konings@esat.kuleuven.be>
+Description: wikiRobot provides access to the MediaWiki API and a Sweave driver for MediaWiki markup, enabling collaborative reporting using Mediawiki
+License: GPL (>= 3)
+Depends: XML, RCurl
+Enhances: boot, survival, cluster, rpart, nnet
+URL: http://wikirobot.r-forge.r-project.org
+LazyLoad: yes
+Collate: 'wikiEdit.R' 'wikiError.R' 'wikiFailure.R' 'wikiLogin.R'
+    'wikiLogout.R' 'wikiWarning.R' 'wikiCore.R'

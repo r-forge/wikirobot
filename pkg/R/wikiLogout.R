@@ -25,21 +25,22 @@
 #' 
 #' This function is used to log a bot out of a wiki.
 #' 
-#' @param baseURL a string giving the base URL of the wiki
-#' @param userid a string containing the enwikiUserID cookie
-#' @param username a string containing the enwikiUserName cookie
-#' @param token a string containing the enwikiToken cookie
-#' @param sessionid a string containing the enwiki_session cookie
-#' @param handle a curl handle
-#' @return returns invisibly, deleting the login tokens and other browser cookies
+#' @param loginResult a list containing the userid, username, token, sessionid and 
+#'  curl handle resulting from \code{\link{wikiLogin()}}
+#' @return returns invisibly after a succesful logout, deleting the login tokens and other browser cookies
 #' @note This function cannot return an error according to the mediawiki API documentation. If the returned result
 #' is not equal to the documented version however, an 'unknown logout result' error is thrown.
 #' @references \url{http://www.mediawiki.org/wiki/API:Logout}
 #' @author Peter Konings \email{peter.konings@@esat.kuleuven.be}
-wikiLogout <- function(baseURL, userid, username, token, sessionid, handle)
+wikiLogout <- function(loginResult)
 {
-	logoutRequest <- paste(baseURL, 'api.php?action=logout&format=xml', sep = '')
-	logoutResult <- postWikiForm(logoutRequest, userid, username, token, sessionid, handle)
+	logoutRequest <- paste(loginResult$baseURL, 'api.php?action=logout&format=xml', sep = '')
+	logoutResult <- postForm(uri = logoutRequest, 
+			'lguserid' = loginResult$lguserid,
+			'lgusername' = loginResult$lgusername,
+			'lgtoken' = loginResult$token,
+			'sessionid' = loginResult$sessionid,
+			curl = loginResult$handle)
 	if (logoutResult != "<?xml version=\"1.0\"?><api />")
 	{
 		stop('Unknown logout result:\n', logoutResult)
